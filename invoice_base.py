@@ -292,6 +292,24 @@ def add_payment(check, payment, cv):
 def make_invoice_num():
     pass
 
+def delete_one_rec(val,f_name):
+    
+    with open(f_name,'r') as file:
+        with open('temp_file.csv','w') as temp:
+            
+            p_reader = csv.reader(file)
+            t_f_writer = csv.writer(temp)
+            
+            for row in p_reader:
+                if val == row:
+                    pass
+                else:
+                    t_f_writer.writerow(row)
+    
+    shutil.move('temp_file.csv',f_name)
+    
+    return
+
 class coreFunctionality:
     
     @staticmethod
@@ -730,10 +748,105 @@ class coreFunctionality:
     
     @staticmethod
     def delete_record(self):
+        
+        while True:
+            try:
+                decision = int(input("Select whihch record do you want to delete? 1: Invoice\n2: Customer\n3: Payment\n4: Product"))
+                
+                if decision > 4 or decision < 1:
+                    print("Wrong input number, please select again.")
+                    continue
+                else:
+                    
+                    store_list = ['invoice_records.csv','customer_records.csv','payment_records.csv','product_records.csv']
+                    arg_list = ['Invoice Number /  Customer Name','Customer Name','Payment ID','Product Name / Shorthand']
+                    
+                    with open(store_list[decision+1],'r') as file:
+                        
+                        value = input("Enter the "+arg_list[decision+1]+" to be deleted: ")
+                        
+                        reader = csv.reader(file)
+                        check_arr = []
+                        for i in reader:
+                            if value in i:
+                                check_arr.append(i)
+                        
+                        if len(check_arr) == 1:
+                            delete_one_rec (check_arr[0],store_list[decision+1])
+                            return
+                        
+                        elif len(check_arr) == 0:
+                            print("No such record exists, redirecting to main menu.")
+                            return
+                        else:
+
+                            for i,j in enumerate(check_arr):
+                                print(i+1," : ",j)
+                            
+                            try:
+                                
+                                rec_num = int(input("Please select the record to be deleted: "))
+                                
+                                if rec_num < 1 or rec_num > len(check_arr):
+                                    raise Exception()
+                            except:
+                                print("Invalid input, please try again.")
+                                continue
+                            
+                            delete_one_rec(check_arr[rec_num-1],store_list[decision+1])
+                            return
+                
+            except:
+                print("Invalid response, please try again.")
+                continue
+        
         return
     
     @staticmethod
     def view_record(self):
+        
+        iv = 'customer_name,invoice_number,invoice_value,item_list,item_quantity,item_cost,invoice_date,note'
+        pt = 'payment_id,customer_supplier,payment_amount,pay_to_pay,date_creation,due_date'
+        pd = 'product_name,product_variants,product_variant_cost,variant_inventory,product_shorthand,product_tax_rate,note'
+        cs = 'customer_name,customer_contact,customer_address,customer_pin,customer_co_name,customer_tax_id,customer_balance,customer_life_value,customer_note'
+        m_ar = [iv,cs,pt,pd]
+        store_list = ['invoice_records.csv','customer_records.csv','payment_records.csv','product_records.csv']
+        
+        while True:
+            
+            try:    
+                get_file = int(input("What records do you want to see?\n 1. Invoice\n2. Customer\n3. Payment\n4. Product"))
+                
+                if get_file > 4 or get_file < 1:
+                    raise Exception()
+                
+                search_term = input("Enter the seach term.")
+                
+                checker = False
+                
+                with open(store_list[get_file-1],'r') as file:
+                    
+                    reader = csv.reader(file)
+                    
+                    for r in reader:
+                        if search_term in r:
+                            checker = True
+                            print_ar = m_ar[get_file].split(',')
+                            for i in range(len(print_ar)):
+                                print(print_ar[i]," : ",r[i],"\n")
+                            
+                            print("-----**-----")
+                            
+                    
+                    if checker == False:
+                        print("Search term did not exist. Going back to main menu.")
+                        
+                    return
+                
+            except:
+                print("Wrong input, please enter again.")
+                continue
+        
         return
 
     @staticmethod
@@ -760,7 +873,7 @@ def main_app():
     
     functionRunner = coreFunctionality.__dict__.get(function_list[input_1])
     functionRunner.__func__()
-    
+    # Need to design better funcitonality for entering and exitig main app.
     main_app()
 
 if __name__ == "__main__":

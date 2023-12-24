@@ -8,12 +8,8 @@ import pandas
 from collections import deque
 import shutil
 
-try:
-    j = "oo-oo"
-    l = j.split('o')
-except:
-    print("BOO")
-        
+
+k,l = ((34,45),('A','P'))
 
 """a = 'a,b,c,dd|ff|rr|jj,d1|f2|r3|j4,e,r'
 b = a.split(',')
